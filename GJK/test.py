@@ -20,15 +20,13 @@ GREEN = (  0, 255,   0)
 RED   = (255,   0,   0)
 
 def run():
-    circle1 = ((400, 300), 100)
-    circle2 = ((600, 100), 100)
-
-    poly1 = (
+    poly_list = [(
         ( 00 + 400,  50 + 300),
         (-50 + 400,  50 + 300),
         (-50 + 400,   0 + 300)
-    )
-
+    )]
+    circle_list = [((400, 300), 100),
+                       ((600, 100), 100)]
 
     while True:
         for event in pygame.event.get():
@@ -49,22 +47,34 @@ def run():
                     
 
         SCREEN.fill(WHITE)
-        poly2 = makePolyFromMouse()
-
-        collide, dist = gjk_epa.collidePolyPoly(poly2, poly1)
-        polygon(poly1)
-        # polygon(list(map(lambda x: (x[0] + 200, x[1] + 200 ),sim)))
-
-        collide1, dist1 = gjk_epa.collidePolyCircle(poly2, circle2)
-        circle(circle2)
+        poly_mouse = makePolyFromMouse()
         
-        # collide2 = gjk_epa.collidePolyCircle(poly2, circle2)
-        # circle(circle2)
+        dist = list()
+        collide = list()
+
+        for p in poly_list:
+            col, d = gjk_epa.collidePolyPoly(poly_mouse, p)
+            dist.append(d)
+            collide.append(col)
+            polygon(p)
+            
+        for c in circle_list:
+            col, d = gjk_epa.collidePolyCircle(poly_mouse, c)
+            dist.append(d)
+            collide.append(col)
+            circle(c)
+            
+            
+        if any(collide):
+            d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+            index = d_max.index(max(d_max))
+            print(d_max[index])
+            line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
+            polygon(poly_mouse, GREEN)
+        else:
+            polygon(poly_mouse, RED)
         
-        print(sqrt(dist[0] ** 2 + dist[1] ** 2))
-        if sqrt(dist[0] ** 2 + dist[1] ** 2) != 0:
-            line((0,0), dist)
-        polygon(poly2, GREEN if collide or collide1 else RED)
+
         
         pygame.display.flip()
         CLOCK.tick(60)
