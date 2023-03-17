@@ -1,13 +1,16 @@
 from math import sqrt
+import numpy as np
+from numpy import add 
+from numpy import subtract as sub
+from numpy import negative as neg
+
 
 
 def normalize(vector):
-    """
-    Вектор масштабируется до длины 1
-    """
-    norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
-    return vector[0] / norm, vector[1] / norm
-
+    # if vector == (0,0): return vector
+    # norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
+    # return vector[0] / norm, vector[1] / norm
+    return vector / np.linalg.norm(vector)
 
 def dot(vector1, vector2):
     """

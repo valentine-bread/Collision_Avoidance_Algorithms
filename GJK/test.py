@@ -25,8 +25,9 @@ def run():
         (-50 + 400,  50 + 300),
         (-50 + 400,   0 + 300)
     )]
-    circle_list = [((400, 300), 100),
-                       ((600, 100), 100)]
+    circle_list = [#((400, 300), 100),
+                   ((600, 100), 100)
+                       ]
 
     while True:
         for event in pygame.event.get():
@@ -47,37 +48,65 @@ def run():
                     
 
         SCREEN.fill(WHITE)
-        poly_mouse = makePolyFromMouse()
+        poly_mouse = makeCircleFromMouse()
         
         dist = list()
         collide = list()
 
+        # for p in poly_list:
+        #     col, d = gjk_epa.collidePolyPoly(poly_mouse, p)
+        #     dist.append(d)
+        #     collide.append(col)
+        #     polygon(p)
+            
+        # for c in circle_list:
+        #     col, d = gjk_epa.collidePolyCircle(poly_mouse, c)
+        #     dist.append(d)
+        #     collide.append(col)
+        #     circle(c)
+        
         for p in poly_list:
-            col, d = gjk_epa.collidePolyPoly(poly_mouse, p)
+            col, d = gjk_epa.collidePolyCircle(p, poly_mouse)
             dist.append(d)
             collide.append(col)
             polygon(p)
             
         for c in circle_list:
-            col, d = gjk_epa.collidePolyCircle(poly_mouse, c)
+            col, d = gjk_epa.collideCircleCircle(poly_mouse, c)
             dist.append(d)
             collide.append(col)
             circle(c)
             
-            
+        print(dist)    
         if any(collide):
-            d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
-            index = d_max.index(max(d_max))
-            print(d_max[index])
-            line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
-            polygon(poly_mouse, GREEN)
+        #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+        #     index = d_max.index(max(d_max))
+        #     print(d_max[index])
+        #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
+            circle(poly_mouse, GREEN)
         else:
-            polygon(poly_mouse, RED)
+            circle(poly_mouse, RED)
+        
+        # if any(collide):
+        #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+        #     index = d_max.index(max(d_max))
+        #     print(d_max[index])
+        #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
+        #     circle(poly_mouse, GREEN)
+        # else:
+        #     circle(poly_mouse, RED)
         
 
         
         pygame.display.flip()
         CLOCK.tick(60)
+
+def makeCircleFromMouse():
+    pos = pygame.mouse.get_pos()
+
+    return (
+        ((0 + pos[0], 0 + pos[1]), 20)
+    )
 
 def makePolyFromMouse():
     pos = pygame.mouse.get_pos()

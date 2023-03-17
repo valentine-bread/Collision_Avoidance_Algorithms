@@ -1,17 +1,31 @@
 from math import sqrt
 import numpy as np
+from numpy import add 
+from numpy import subtract as sub
+from numpy import negative as neg
 
-def add(v1, v2):
-    return (v1[0] + v2[0], v1[1] + v2[1])
 
-def sub(v1, v2):
-    return (v1[0] - v2[0], v1[1] - v2[1])
+# def add(v1, v2):
+#     return np.add(v1,v2)
+#     # return (v1[0] + v2[0], v1[1] + v2[1])
 
-def neg(v):
-    return (-v[0], -v[1])
+# def sub(v1, v2):
+#     return np.subtract(v1,v2)
+#     # return (v1[0] - v2[0], v1[1] - v2[1])
+
+# def neg(v):
+#     return np.negative(v)
+#     # return (-v[0], -v[1])
 
 def dot(v1, v2):
+    # np.dot(v1,v2)
     return v1[0] * v2[0] + v1[1] * v2[1]
+
+def normalize(vector):
+    # if vector == (0,0): return vector
+    # norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
+    # return vector[0] / norm, vector[1] / norm
+    return vector / np.linalg.norm(vector)
 
 def aXbXa(v1, v2):
     """
@@ -43,6 +57,7 @@ def supportPoly(polygon, direction):
 
 def supportCircle(circle, direction):
     mag = sqrt(dot(direction, direction))
+    if mag == 0: mag = 0.000001
     s = circle[1] / mag
     center = circle[0]
     return (center[0] + s * direction[0], center[1] + s * direction[1])
@@ -55,6 +70,9 @@ def collidePolyPoly(poly1, poly2):
 
 def collidePolyCircle(poly, circle):
     return collide(poly, circle, supportPoly, supportCircle)
+
+def collideCircleCircle(poly, circle):
+    return collide(poly, circle, supportCircle, supportCircle)
 
 def collide(shape1, shape2, support1, support2):
     s = support(shape1, shape2, support1, support2, (-1, -1))
@@ -133,16 +151,10 @@ def doSimplex(simplex, d):
 
     return False
 
-
-def normalize(vector):
-    if vector == (0,0): return vector
-    norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
-    return vector[0] / norm, vector[1] / norm
-
 def epa(polytope, shapeA, shapeB, f1 , f2):
 	minIndex = 0
 	minDistance = float('inf')
-	minNormal = 0
+	# minNormal = 0
 
 	while (minDistance == float('inf')): 
 		for i in range(0, len(polytope)): 
@@ -158,7 +170,6 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 				distance *= -1
 				normal *= -1
 			
-
 			if (distance < minDistance):
 				minDistance = distance
 				minNormal = normal
@@ -170,5 +181,31 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 		if(abs(sDistance - minDistance) > 0.001):
 			minDistance = float('inf')
 			polytope.insert(minIndex, support_t)
+		else:
+			break
 
 	return minNormal * (minDistance + 0.001)
+
+
+# def closestEdge(polytope):
+# 	npts = len(polytope)
+# 	dmin = float('inf')
+# 	closest = 0
+# 	for i in range(0, npts):
+# 		p = polytope[i]
+# 		q = polytope[(i + 1) % npts]
+# 		e = sub(q, p)
+# 		n = np.array(normalize((e[1], -e[0])))
+# 		dist = dot(n, p)
+# 		if dist < dmin: 
+# 			dmin = dist
+# 			closest	= [dist, i, p, q, n]
+# 	return closest
+
+# def epa(polytope, pts1, pts2, f1 , f2):
+# 	while True:
+# 		dist, i, p, q, n = closestEdge(polytope)		
+# 		r = support(pts1, pts2, f1, f2, n)
+# 		if (abs(dot(n, r) - dist) < 0.001):
+# 			return dist
+# 		polytope.insert(i + 1, r)
