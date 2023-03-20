@@ -9,6 +9,8 @@ from pygame.locals import *
 
 import gjk_epa
 
+
+
 pygame.init()
 SCREEN = pygame.display.set_mode((800, 600))
 CLOCK = pygame.time.Clock()
@@ -77,24 +79,24 @@ def run():
             collide.append(col)
             circle(c)
             
-        print(dist)    
-        if any(collide):
-        #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
-        #     index = d_max.index(max(d_max))
-        #     print(d_max[index])
-        #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
-            circle(poly_mouse, GREEN)
-        else:
-            circle(poly_mouse, RED)
-        
+        # print(dist)    
         # if any(collide):
-        #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
-        #     index = d_max.index(max(d_max))
-        #     print(d_max[index])
-        #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
+        # #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+        # #     index = d_max.index(max(d_max))
+        # #     print(d_max[index])
+        # #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
         #     circle(poly_mouse, GREEN)
         # else:
         #     circle(poly_mouse, RED)
+        
+        if any(collide):
+            d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+            index = d_max.index(max(d_max))
+            print(d_max[index])
+            line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
+            circle(poly_mouse, GREEN)
+        else:
+            circle(poly_mouse, RED)
         
 
         
