@@ -54,19 +54,7 @@ def run():
         
         dist = list()
         collide = list()
-
-        # for p in poly_list:
-        #     col, d = gjk_epa.collidePolyPoly(poly_mouse, p)
-        #     dist.append(d)
-        #     collide.append(col)
-        #     polygon(p)
-            
-        # for c in circle_list:
-        #     col, d = gjk_epa.collidePolyCircle(poly_mouse, c)
-        #     dist.append(d)
-        #     collide.append(col)
-        #     circle(c)
-        
+     
         for p in poly_list:
             col, d = gjk_epa.collidePolyCircle(p, poly_mouse)
             dist.append(d)
@@ -78,17 +66,7 @@ def run():
             dist.append(d)
             collide.append(col)
             circle(c)
-            
-        # print(dist)    
-        # if any(collide):
-        # #     d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
-        # #     index = d_max.index(max(d_max))
-        # #     print(d_max[index])
-        # #     line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
-        #     circle(poly_mouse, GREEN)
-        # else:
-        #     circle(poly_mouse, RED)
-        
+
         if any(collide):
             d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
             index = d_max.index(max(d_max))
