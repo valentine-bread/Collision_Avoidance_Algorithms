@@ -178,7 +178,7 @@ def angle(v1, v2 = [(1,0),(0,0)], deg = True):
     v2_u = normalize(v2)
     radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     result = radians
-    # if deg:
-    #     result = np.degrees([radians.real])[0]  # переводим в градусы
+    if deg:
+        result = np.degrees([radians.real])[0]  # переводим в градусы
  
     return result[0]
