@@ -4,27 +4,10 @@ from numpy import add
 from numpy import subtract as sub
 from numpy import negative as neg
 
-
-# def add(v1, v2):
-#     return np.add(v1,v2)
-#     # return (v1[0] + v2[0], v1[1] + v2[1])
-
-# def sub(v1, v2):
-#     return np.subtract(v1,v2)
-#     # return (v1[0] - v2[0], v1[1] - v2[1])
-
-# def neg(v):
-#     return np.negative(v)
-#     # return (-v[0], -v[1])
-
 def dot(v1, v2):
-    # np.dot(v1,v2)
     return v1[0] * v2[0] + v1[1] * v2[1]
 
 def normalize(vector):
-    # if vector == (0,0): return vector
-    # norm = sqrt(vector[0] ** 2 + vector[1] ** 2)
-    # return vector[0] / norm, vector[1] / norm
     return vector / np.linalg.norm(vector)
 
 def aXbXa(v1, v2):
@@ -34,7 +17,6 @@ def aXbXa(v1, v2):
     performed in 3D with z=0. The output is the (x, y)
     component of the 3D cross product.
     """
-
     x0 = v1[0]
     x1 = v1[1]
     x1y0 = x1 * v2[0]
@@ -187,25 +169,16 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 	return minNormal * (minDistance + 0.001)
 
 
-# def closestEdge(polytope):
-# 	npts = len(polytope)
-# 	dmin = float('inf')
-# 	closest = 0
-# 	for i in range(0, npts):
-# 		p = polytope[i]
-# 		q = polytope[(i + 1) % npts]
-# 		e = sub(q, p)
-# 		n = np.array(normalize((e[1], -e[0])))
-# 		dist = dot(n, p)
-# 		if dist < dmin: 
-# 			dmin = dist
-# 			closest	= [dist, i, p, q, n]
-# 	return closest
+def dist(vector):
+    return sqrt(vector[0] ** 2 + vector[1] ** 2)
 
-# def epa(polytope, pts1, pts2, f1 , f2):
-# 	while True:
-# 		dist, i, p, q, n = closestEdge(polytope)		
-# 		r = support(pts1, pts2, f1, f2, n)
-# 		if (abs(dot(n, r) - dist) < 0.001):
-# 			return dist
-# 		polytope.insert(i + 1, r)
+
+def angle(v1, v2 = [(1,0),(0,0)], deg = True):
+    v1_u = normalize(v1)
+    v2_u = normalize(v2)
+    radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+    result = radians
+    # if deg:
+    #     result = np.degrees([radians.real])[0]  # переводим в градусы
+ 
+    return result[0]

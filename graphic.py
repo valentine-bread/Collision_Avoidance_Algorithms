@@ -1,5 +1,9 @@
+frequency = 30
+norm_noise = 0
+
 from math import sqrt
 import sys
+import random as rd
 
 import numpy as np
 
@@ -72,6 +76,10 @@ class Poly():
   
 	def getPoly(self):
 		return self.poly
+
+	def add(self, cx, cy):
+		self.poly = list(map(lambda x: (x[0] + cx, x[1] + cy), self.poly))
+		self.minMaxXY = self.minMax()
 	
 class Circle():
 	center = (0,0)
@@ -87,7 +95,8 @@ class Circle():
 		return [(self.center[0] - self.radius, self.center[0] + self.radius), (self.center[1] - self.radius, self.center[1] + self.radius)]
 
 	def makeFromMouse(R):
-		return Circle(pygame.mouse.get_pos(), R)	 
+		noise = rd.randint(-norm_noise, norm_noise)
+		return Circle(tuple(map(lambda x: x +  noise, pygame.mouse.get_pos())), R)	 
 
 	def getMinMax(self): return self.minMaxXY
 	
@@ -107,32 +116,36 @@ class Circle():
 		return gjk_epa.collidePolyCircle(poly, self.getCircle())
 
 
-
-
 def run():
 	
 	wall = [
-    	Poly([(0, 0), (0, 150), (10, 150), (10, 0)]),
+		Poly([(0, 0), (0, 150), (10, 150), (10, 0)]),
 		Poly([(0, 150), (0, 550), (10, 550), (10, 150)]),
   
 		Poly([(0, 150), (0, 550), (10, 550),	(10, 150)]),
 		Poly([(10, 0), (10, 10), (380, 10), (380, 0)]),
   
 		Poly([(380, 0), (380, 10), (580, 10), (580, 0)]),
-    	Poly([(570, 10), (580, 10), (580, 550), (570, 550)]),
-     
-     	Poly([(0, 550), (0, 560), (380, 560), (380, 550)]),
+		Poly([(570, 10), (580, 10), (580, 550), (570, 550)]),
+	 
+	 	Poly([(0, 550), (0, 560), (380, 560), (380, 550)]),
 		Poly([(380, 550), (380, 560), (580, 560), (580, 550)]),
   
   		Poly([(380, 550), (380, 10), (390, 10), (390, 550)]),
-    
-    	Poly([(10, 150), (10, 160), (390, 160), (390, 150)]),
-     	
-      	Circle((100,100),40)]
+	
+		Poly([(10, 150), (10, 160), (390, 160), (390, 150)])
+	]
+	list(map(lambda x: x.add(50, 50), wall))
+	 
+	furniture = [
+		Circle((100,100),40)
+	]
+	  	
 
 	
-	allobj = list()
-	allobj += wall
+	allobj = list(wall)
+	allobj += furniture
+	
 	# N = 20
 	# allobj = [makeBoxFormCenter(coord, 10, 10) for coord in np.random.randn(N, 2) * height/3 + (width/2, height/2)]
 	tree = AABBTree()
@@ -172,20 +185,20 @@ def run():
 				col, d = allobj[i].collide(poly_mouse)
 				dist.append(d)
 				collide.append(col)
-    	
+		
 		if found_points:
-			d_max = list(map(lambda x: sqrt(x[0] ** 2 + x[1] ** 2), dist))
+			d_max = list(map(gjk_epa.dist, dist))
 			index = d_max.index(max(d_max))
-			print(d_max[index])
+			print(d_max[index], gjk_epa.angle(dist[index]))
+			printText(str(int(d_max[index])), (0,0))
+			printText(str(gjk_epa.angle(dist[index])), (0,20))
 			line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
 			poly_mouse.draw(GREEN)
 		else:
 			poly_mouse.draw(RED)
    
-			
-		
 		pygame.display.flip()
-		CLOCK.tick(60)
+		CLOCK.tick(frequency)
 
 
 
@@ -211,5 +224,11 @@ def line(start, end, color=BLACK, camera=(0, 0)):
 def add(p1, p2):
 	return p1[0] + p2[0], p1[1] + p2[1]
 
+def printText(text, pos):
+	f1 = pygame.font.Font(None, 36)
+	text1 = f1.render(text, 1, (180, 0, 0))
+	SCREEN.blit(text1, pos)
+
 if __name__ == '__main__':
 	run()	
+ 
