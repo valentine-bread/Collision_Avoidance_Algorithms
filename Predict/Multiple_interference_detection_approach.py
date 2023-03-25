@@ -1,4 +1,4 @@
-frequency = 30
+frequency = 1
 norm_noise = 0
 
 from math import sqrt
@@ -10,10 +10,9 @@ import numpy as np
 import pygame
 from pygame.locals import *
 
-from aabbtree import AABB, AABBTree
-from GJK import gjk_epa
 
 from Graphic import Display, Poly, Circle, BLACK, WHITE, BLUE, GREEN, RED
+
 
 
 def run():
@@ -41,17 +40,12 @@ def run():
 		Circle((100,100),40)
 	]
 	  	
-
+	previousPosition = pygame.mouse.get_pos()
 	
 	allobj = list(wall)
 	allobj += furniture
 	
-	# N = 20
-	# allobj = [makeBoxFormCenter(coord, 10, 10) for coord in np.random.randn(N, 2) * height/3 + (width/2, height/2)]
-	tree = AABBTree()
-	for i in range(len(allobj)):
-		aabb = AABB(allobj[i].getMinMax())
-		tree.add(aabb, i)   
+
 
 	display = Display()
 
@@ -74,35 +68,18 @@ def run():
 
 		display.SCREEN.fill(WHITE)
 		poly_mouse = Circle.makeFromMouse(20)
-		aabb = AABB(poly_mouse.getMinMax())
-		found_points = tree.overlap_values(aabb)
+		position = poly_mouse.center	
+		# move = sqrt((position[0] - previousPosition[0])**2 + (position[1] - previousPosition[1])**2) / (1/frequency)
+		move = ((position[0] - previousPosition[0]) / frequency, (position[1] - previousPosition[1]) / frequency) 
+		for i in range(1,4):
+			Circle((position[0] + move[0]*i, position[1] + move[1]*i),20).draw(GREEN)
+		print(move)
   
-		# dist = list()
-		result = list()
-		collide = False	
-			
 		for i in range(len(allobj)):
 			allobj[i].draw(BLACK)
-			if i in found_points:
-				col, vector = allobj[i].collide(poly_mouse)
-				if col:
-					result.append((i, gjk_epa.dist(vector), gjk_epa.angle(vector)))
-					# dist.append(d)
-					collide = True
-		
-		if collide:
-			for r in result:
-				display.log(*r)
-			# d_max = list(map(gjk_epa.dist, dist))
-			# index = d_max.index(max(d_max))
-			# # print(d_max[index], gjk_epa.angle(dist[index]))
-			# printText(str(int(d_max[index])), (0,0))
-			# printText(str(int(gjk_epa.angle(dist[index]))), (0,20))
-			# line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
-			poly_mouse.draw(GREEN)
-		else:
-			poly_mouse.draw(RED)
-   
+		poly_mouse.draw(RED)
+			
+		previousPosition = position
 		pygame.display.flip()
 		display.CLOCK.tick(frequency)
   
