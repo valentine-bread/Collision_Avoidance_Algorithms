@@ -105,7 +105,7 @@ class Poly():
 		return gjk_epa.collidePolyCircle(self.poly, circle)
 
 	def collidePoly(self, poly):
-		return gjk_epa.collidePolyCircle(self.poly, poly)
+		return gjk_epa.collidePolyPoly(self.poly, poly)
 
 	def draw(self, color):
 		Display.polygon(self.poly, color)
