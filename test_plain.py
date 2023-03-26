@@ -13,7 +13,7 @@ from pygame.locals import *
 from aabbtree import AABB, AABBTree
 from GJK import gjk_epa
 
-from Graphic import Display, Poly, Circle, BLACK, WHITE, BLUE, GREEN, RED
+from Graphic.graphic_gik_epa import Display, Poly, Circle, BLACK, WHITE, BLUE, GREEN, RED
 
 
 def run():
@@ -87,19 +87,21 @@ def run():
 				col, vector = allobj[i].collide(poly_mouse)
 				if col:
 					result.append((i, gjk_epa.dist(vector), gjk_epa.angle(vector)))
+					display.line((poly_mouse.center), (vector[0] + poly_mouse.center[0], vector[1] + poly_mouse.center[1]), RED)
 					# dist.append(d)
 					collide = True
 		
 		if collide:
 			for r in result:
 				display.log(*r)
+				# line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
 			# d_max = list(map(gjk_epa.dist, dist))
 			# index = d_max.index(max(d_max))
 			# # print(d_max[index], gjk_epa.angle(dist[index]))
 			# printText(str(int(d_max[index])), (0,0))
 			# printText(str(int(gjk_epa.angle(dist[index]))), (0,20))
 			# line((200,200), (dist[index][0] + 200, dist[index][1] + 200))
-			poly_mouse.draw(GREEN)
+			# poly_mouse.draw(GREEN)
 		else:
 			poly_mouse.draw(RED)
    
