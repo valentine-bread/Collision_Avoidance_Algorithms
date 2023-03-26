@@ -1,2 +1,4 @@
-*_pycache_*
-*/test.py
+#
+__pycache__
+#
+test.py
