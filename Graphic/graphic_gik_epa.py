@@ -12,7 +12,7 @@ from pygame.locals import *
 
 from aabbtree import AABB, AABBTree
 from GJK import gjk_epa
-from distance_project import distance_poly_point, distance_circle_point
+from distance_project import distance_poly_point, distance_circle_point, intersection_poly_poly
 
 
 BLACK = (  0,   0,   0)
@@ -123,6 +123,9 @@ class Poly():
 
 	def dictance_to_point(self,point):
 		return distance_poly_point(point,self.poly)
+
+	def intersection_poly(self,poly1):
+		return intersection_poly_poly(self.poly, poly1.poly)
 	
 class Circle():
 	center = (0,0)

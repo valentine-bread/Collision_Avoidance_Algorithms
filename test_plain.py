@@ -19,21 +19,7 @@ from Graphic.graphic_gik_epa import Display, Poly, Circle, BLACK, WHITE, BLUE, G
 def run():
 	
 	wall = [
-		Poly([(0, 0), (0, 150), (10, 150), (10, 0)]),
-		Poly([(0, 150), (0, 550), (10, 550), (10, 150)]),
-  
-		Poly([(0, 150), (0, 550), (10, 550),	(10, 150)]),
-		Poly([(10, 0), (10, 10), (380, 10), (380, 0)]),
-  
-		Poly([(380, 0), (380, 10), (580, 10), (580, 0)]),
-		Poly([(570, 10), (580, 10), (580, 550), (570, 550)]),
-	 
-	 	Poly([(0, 550), (0, 560), (380, 560), (380, 550)]),
-		Poly([(380, 550), (380, 560), (580, 560), (580, 550)]),
-  
-  		Poly([(380, 550), (380, 10), (390, 10), (390, 550)]),
-	
-		Poly([(10, 150), (10, 160), (390, 160), (390, 150)])
+		Poly([(0, 0), (0, 150), (10, 150), (10, 0)])
 	]
 	list(map(lambda x: x.add(50, 50), wall))
 	 
@@ -84,12 +70,16 @@ def run():
 		for i in range(len(allobj)):
 			allobj[i].draw(BLACK)
 			if i in found_points:
-				col, vector = allobj[i].collide(poly_mouse)
+				col, (pol, vector) = allobj[i].collide(poly_mouse)
 				if col:
 					result.append((i, gjk_epa.dist(vector), gjk_epa.angle(vector)))
-					display.line((poly_mouse.center), (vector[0] + poly_mouse.center[0], vector[1] + poly_mouse.center[1]), RED)
+					display.line(((400,400)), (vector[0] + 400, vector[1] + 400), RED)
 					# dist.append(d)
+					pol = Poly(pol)
+					pol.add(400,400)
+					pol.draw(BLACK)
 					collide = True
+			
 		
 		if collide:
 			for r in result:

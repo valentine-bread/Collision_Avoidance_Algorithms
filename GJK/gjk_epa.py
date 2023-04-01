@@ -5,133 +5,133 @@ from numpy import subtract as sub
 from numpy import negative as neg
 
 def dot(v1, v2):
-    return v1[0] * v2[0] + v1[1] * v2[1]
+	return v1[0] * v2[0] + v1[1] * v2[1]
 
 def normalize(vector):
-    return vector / np.linalg.norm(vector)
+	return vector / np.linalg.norm(vector)
 
 def aXbXa(v1, v2):
-    """
-    Performs v1 X v2 X v1 where X is the cross product. The
-    input vectors are (x, y) and the cross products are
-    performed in 3D with z=0. The output is the (x, y)
-    component of the 3D cross product.
-    """
-    x0 = v1[0]
-    x1 = v1[1]
-    x1y0 = x1 * v2[0]
-    x0y1 = x0 * v2[1]
-    return (x1 * (x1y0 - x0y1), x0 * (x0y1 - x1y0))
+	"""
+	Performs v1 X v2 X v1 where X is the cross product. The
+	input vectors are (x, y) and the cross products are
+	performed in 3D with z=0. The output is the (x, y)
+	component of the 3D cross product.
+	"""
+	x0 = v1[0]
+	x1 = v1[1]
+	x1y0 = x1 * v2[0]
+	x0y1 = x0 * v2[1]
+	return (x1 * (x1y0 - x0y1), x0 * (x0y1 - x1y0))
 
 def supportPoly(polygon, direction):
-    bestPoint = polygon[0]
-    bestDot = dot(bestPoint, direction)
+	bestPoint = polygon[0]
+	bestDot = dot(bestPoint, direction)
 
-    for i in range(1, len(polygon)):
-        p = polygon[i]
-        d = dot(p, direction)
+	for i in range(1, len(polygon)):
+		p = polygon[i]
+		d = dot(p, direction)
 
-        if d > bestDot:
-            bestDot = d
-            bestPoint = p
+		if d > bestDot:
+			bestDot = d
+			bestPoint = p
 
-    return bestPoint
+	return bestPoint
 
 def supportCircle(circle, direction):
-    mag = sqrt(dot(direction, direction))
-    if mag == 0: mag = 0.000001
-    s = circle[1] / mag
-    center = circle[0]
-    return (center[0] + s * direction[0], center[1] + s * direction[1])
+	mag = sqrt(dot(direction, direction))
+	if mag == 0: mag = 0.000001
+	s = circle[1] / mag
+	center = circle[0]
+	return (center[0] + s * direction[0], center[1] + s * direction[1])
 
 def support(poly1, poly2, support1, support2, direction):
-    return sub(support1(poly1, direction), support2(poly2, neg(direction)))
+	return sub(support1(poly1, direction), support2(poly2, neg(direction)))
 
 def collidePolyPoly(poly1, poly2):
-    return collide(poly1, poly2, supportPoly, supportPoly)
+	return collide(poly1, poly2, supportPoly, supportPoly)
 
 def collidePolyCircle(poly, circle):
-    return collide(poly, circle, supportPoly, supportCircle)
+	return collide(poly, circle, supportPoly, supportCircle)
 
 def collideCircleCircle(poly, circle):
-    return collide(poly, circle, supportCircle, supportCircle)
+	return collide(poly, circle, supportCircle, supportCircle)
 
 def collide(shape1, shape2, support1, support2):
-    s = support(shape1, shape2, support1, support2, (-1, -1))
-    simplex = [s]
-    d = list(neg(s))
+	s = support(shape1, shape2, support1, support2, (-1, -1))
+	simplex = [s]
+	d = list(neg(s))
 
-    for i in range(100):
-        a = support(shape1, shape2, support1, support2, d)
+	for i in range(100):
+		a = support(shape1, shape2, support1, support2, d)
 
-        if dot(a, d) < 0:
-            return False, (0,0)
+		if dot(a, d) < 0:
+			return False, ([(0,0),(0,0)], (0,0))
 
-        simplex.append(a)
+		simplex.append(a)
 
-        if doSimplex(simplex, d):
-            return True, epa(simplex, shape1, shape2, support1, support2)
+		if doSimplex(simplex, d):
+			return True, epa(simplex, shape1, shape2, support1, support2)
 
-    raise RuntimeError
+	raise RuntimeError
 
 def doSimplex(simplex, d):
-    l = len(simplex)
+	l = len(simplex)
 
-    if l == 2:
-        b = simplex[0]
-        a = simplex[1]
-        a0 = neg(a)
-        ab = sub(b, a)
+	if l == 2:
+		b = simplex[0]
+		a = simplex[1]
+		a0 = neg(a)
+		ab = sub(b, a)
 
-        if dot(ab, a0) >= 0:
-            cross = aXbXa(ab, a0)
-            d[0] = cross[0]
-            d[1] = cross[1]
-        else:
-            simplex.pop(0)
-            d[0] = a0[0]
-            d[1] = a0[1]
-    else:
-        c = simplex[0]
-        b = simplex[1]
-        a = simplex[2]
-        a0 = neg(a)
-        ab = sub(b, a)
-        ac = sub(c, a)
+		if dot(ab, a0) >= 0:
+			cross = aXbXa(ab, a0)
+			d[0] = cross[0]
+			d[1] = cross[1]
+		else:
+			simplex.pop(0)
+			d[0] = a0[0]
+			d[1] = a0[1]
+	else:
+		c = simplex[0]
+		b = simplex[1]
+		a = simplex[2]
+		a0 = neg(a)
+		ab = sub(b, a)
+		ac = sub(c, a)
 
-        if dot(ab, a0) >= 0:
-            cross = aXbXa(ab, a0)
+		if dot(ab, a0) >= 0:
+			cross = aXbXa(ab, a0)
 
-            if dot(ac, cross) >= 0:
-                cross = aXbXa(ac, a0)
+			if dot(ac, cross) >= 0:
+				cross = aXbXa(ac, a0)
 
-                if dot(ab, cross) >= 0:
-                    return True
-                else:
-                    simplex.pop(1)
-                    d[0] = cross[0]
-                    d[1] = cross[1]
-            else:
-                simplex.pop(0)
-                d[0] = cross[0]
-                d[1] = cross[1]
-        else:
-            if dot(ac, a0) >= 0:
-                cross = aXbXa(ac, a0)
+				if dot(ab, cross) >= 0:
+					return True
+				else:
+					simplex.pop(1)
+					d[0] = cross[0]
+					d[1] = cross[1]
+			else:
+				simplex.pop(0)
+				d[0] = cross[0]
+				d[1] = cross[1]
+		else:
+			if dot(ac, a0) >= 0:
+				cross = aXbXa(ac, a0)
 
-                if dot(ab, cross) >= 0:
-                    return True
-                else:
-                    simplex.pop(1)
-                    d[0] = cross[0]
-                    d[1] = cross[1]
-            else:
-                simplex.pop(1)
-                simplex.pop(0)
-                d[0] = a0[0]
-                d[1] = a0[1]
+				if dot(ab, cross) >= 0:
+					return True
+				else:
+					simplex.pop(1)
+					d[0] = cross[0]
+					d[1] = cross[1]
+			else:
+				simplex.pop(1)
+				simplex.pop(0)
+				d[0] = a0[0]
+				d[1] = a0[1]
 
-    return False
+	return False
 
 def epa(polytope, shapeA, shapeB, f1 , f2):
 	minIndex = 0
@@ -156,7 +156,7 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 				minDistance = distance
 				minNormal = normal
 				minIndex = j
-    
+	
 		support_t = support(shapeA, shapeB, f1, f2, minNormal)
 		sDistance = dot(minNormal,support_t)
 
@@ -166,21 +166,24 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 		else:
 			break
 
-	return minNormal * (minDistance + 0.001)
+	return polytope, minNormal * (minDistance + 0.001)
 
 
 def dist(vector):
-    return sqrt(vector[0] ** 2 + vector[1] ** 2)
+	return sqrt(vector[0] ** 2 + vector[1] ** 2)
 
+def epa_plus(polytope, shapeA, shapeB, f1 , f2):
+    normal = epa(polytope, shapeA, shapeB, f1 , f2)
+    shapeB = list(map(lambda x: (x[0] + normal[0], x[1] + normal[1]), shapeB))
+    
+    
 
 def angle(v1, v2 = [(1,0),(0,0)], deg = True):
-    v1_u = normalize(v1)
-    v2_u = normalize(v2)
-    radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-    result = radians
-    if deg:
-        result = np.degrees([radians.real])[0]  # переводим в градусы
+	v1_u = normalize(v1)
+	v2_u = normalize(v2)
+	radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+	result = radians
+	if deg:
+		result = np.degrees([radians.real])[0]  # переводим в градусы
  
-    return result[0]
-
-
+	return result[0]

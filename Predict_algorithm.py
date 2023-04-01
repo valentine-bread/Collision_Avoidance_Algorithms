@@ -1,7 +1,9 @@
 frequency = 20
 norm_noise = 20
 time_predict = 3
-
+# alg = 'multi_detect'
+alg = 'project'
+# alg = 'analytic'
 
 from math import sqrt
 import sys
@@ -119,68 +121,75 @@ def run():
 		# move = ((position[0] - previousPosition[0]) / (1/frequency), (position[1] - previousPosition[1]) / (1/frequency)) 
 		# move = (move[0] if move[0] != 0 else 0.00001, move[1] if move[1] != 0 else 0.00001)
 		move = ((position[0] - tmp_position[0]), (position[1] - tmp_position[1])) 
-  
-		# Алгоритм обнаружения множественных помех----
-		for i in range(1,time_predict  * frequency, 2):
-			tmp_position = (position[0] + (move[0] / frequency)*i, position[1] + (move[1] / frequency)*i)
-			tmp_circle = Circle(tmp_position,norm_noise)
-			found_points = tree.overlap_values(AABB(tmp_circle.getMinMax()))
-			result = list()
-			collide = False	
-			for f in found_points:
-				col, vector = allobj[f].collide(tmp_circle)
-				if col:
-					result.append((f, gjk_epa.dist(vector), gjk_epa.angle(vector)))
-					norm_vector = normalize(tuple(vector))
-					dist = gjk_epa.dist(vector)
-					# display.line(poly_mouse.center,  (((tmp_circle.radius - dist) * norm_vector[1]) + tmp_circle.center[0], 
-                    #                    				((tmp_circle.radius - dist) * norm_vector[0]) + tmp_circle.center[1]), BLACK)
-					display.line(poly_mouse.center, allobj[f].dictance_to_point(tmp_circle.center)[1])
-					collide = True
-			# tmp_circle.draw(GREEN if collide else RED)			
-		# -----------------------------------------------
 		
-		# Алгоритм помехи с качающимся объемом
-		# if move != (0,0):
-		# 	tmp_position = (position[0] + (move[0] * time_predict* frequency  * (1/frequency)), position[1] + (move[1] * time_predict* frequency  * (1/frequency)))		
-		# 	tmp_vector = normalize(orthogonal(edge_direction(poly_mouse.center, tmp_position)))
-		# 	volume_rect = Poly([(position[0] + tmp_vector[0] * norm_noise, position[1] + tmp_vector[1] * norm_noise),
-		# 		(position[0] - tmp_vector[0] * norm_noise, position[1] - tmp_vector[1] * norm_noise),
-		# 		(tmp_position[0] - tmp_vector[0] * norm_noise, tmp_position[1] - tmp_vector[1] * norm_noise),
-		# 		(tmp_position[0] + tmp_vector[0] * norm_noise, tmp_position[1] + tmp_vector[1] * norm_noise)])
-		# 	volume_rect.draw(GREEN)
-		# 	projection_circle = Circle(tmp_position, 20)
-		# 	result = list()
-		# 	for obj in [projection_circle, volume_rect, poly_mouse]:			
-		# 		col_result = collide_test(tree, allobj, obj)
-		# 		# col_result = 
-		# 		result += col_result
-		# 		obj.draw(GREEN if col_result else RED)
-		# 		print(result)
-		# 		# for r in result:
-		# 		# 	display.line((200 + r[1][0],150 + r[1][1]),(200,200), BLACK)
-		# ----------------------------------------------
-  
-		# Алгоритм аналитический
-		# poly_mouse = Circle.makeFromMouse(1)
-		# tmp_position = (position[0] + (move[0] * time_predict  * frequency), position[1] + (move[1] * time_predict  * frequency))		
-		# tmp_vector = normalize(orthogonal(edge_direction(poly_mouse.center, tmp_position)))	
-		# move = (1,1) if move == (0,0) else move
-		# radius_projection = norm_noise / (sqrt(move[0] ** 2 + move[1] ** 2)) if (sqrt(move[0] ** 2 + move[1] ** 2)) > 1 else 1
-		# # print(radius_projection)
-		# volume_rect = Poly([(position[0] + tmp_vector[0] * 1, position[1] + tmp_vector[1] * 1),
-		# 	(position[0] - tmp_vector[0] * 1, position[1] - tmp_vector[1] * 1),
-		# 	(tmp_position[0] - tmp_vector[0] * radius_projection, tmp_position[1] - tmp_vector[1] * radius_projection),
-		# 	(tmp_position[0] + tmp_vector[0] * radius_projection, tmp_position[1] + tmp_vector[1] * radius_projection)])
-		# volume_rect.draw(GREEN)
-		# projection_circle = Circle(tmp_position, radius_projection)
-		# result = list()
-		# for obj in [projection_circle, volume_rect, poly_mouse]:			
-		# 	col_result = collide_test(tree, allobj, obj)
-		# 	result += col_result
-		# 	obj.draw(GREEN if col_result else RED)
-		# 	# print(result)
-		#----------------------------------------------
+		match alg:
+			case 'multi_detect':
+				# Алгоритм обнаружения множественных помех----
+				for i in range(1,time_predict  * frequency, 2):
+					tmp_position = (position[0] + (move[0] / frequency)*i, position[1] + (move[1] / frequency)*i)
+					tmp_circle = Circle(tmp_position,norm_noise)
+					found_points = tree.overlap_values(AABB(tmp_circle.getMinMax()))
+					result = list()
+					collide = False	
+					for f in found_points:
+						col, vector = allobj[f].collide(tmp_circle)
+						if col:
+							result.append((f, gjk_epa.dist(vector), gjk_epa.angle(vector)))
+							norm_vector = normalize(tuple(vector))
+							dist = gjk_epa.dist(vector)
+							display.line(poly_mouse.center, allobj[f].dictance_to_point(tmp_circle.center)[1])
+							collide = True
+					# tmp_circle.draw(GREEN if collide else RED)			
+				# -----------------------------------------------
+			case 'project':
+				# Алгоритм помехи с качающимся объемом
+				if move != (0,0):
+					tmp_position = (position[0] + (move[0] * time_predict* frequency  * (1/frequency)), position[1] + (move[1] * time_predict* frequency  * (1/frequency)))		
+					tmp_vector = normalize(orthogonal(edge_direction(poly_mouse.center, tmp_position)))
+					volume_rect = Poly([(position[0] + tmp_vector[0] * norm_noise, position[1] + tmp_vector[1] * norm_noise),
+						(position[0] - tmp_vector[0] * norm_noise, position[1] - tmp_vector[1] * norm_noise),
+						(tmp_position[0] - tmp_vector[0] * norm_noise, tmp_position[1] - tmp_vector[1] * norm_noise),
+						(tmp_position[0] + tmp_vector[0] * norm_noise, tmp_position[1] + tmp_vector[1] * norm_noise)])
+					volume_rect.draw(GREEN)
+					projection_circle = Circle(tmp_position, 20)
+					result = list()
+					# for obj in [projection_circle, volume_rect, poly_mouse]:	
+					for obj in [volume_rect]:			
+						col_result = collide_test(tree, allobj, obj)
+						result += col_result
+						obj.draw(GREEN if col_result else RED)
+						if col_result:
+							# print(result)
+							for f,_ in col_result:
+								print(f)
+								points = allobj[f].intersection_poly(obj)
+								print(points)
+								for point in points:
+									display.line(poly_mouse.center, point, BLACK) 
+
+							
+				# ----------------------------------------------
+			case 'analytic':
+				# Алгоритм аналитический
+				poly_mouse = Circle.makeFromMouse(1)
+				tmp_position = (position[0] + (move[0] * time_predict  * frequency), position[1] + (move[1] * time_predict  * frequency))		
+				tmp_vector = normalize(orthogonal(edge_direction(poly_mouse.center, tmp_position)))	
+				move = (1,1) if move == (0,0) else move
+				radius_projection = norm_noise / (sqrt(move[0] ** 2 + move[1] ** 2)) if (sqrt(move[0] ** 2 + move[1] ** 2)) > 1 else 1
+				# print(radius_projection)
+				volume_rect = Poly([(position[0] + tmp_vector[0] * 1, position[1] + tmp_vector[1] * 1),
+					(position[0] - tmp_vector[0] * 1, position[1] - tmp_vector[1] * 1),
+					(tmp_position[0] - tmp_vector[0] * radius_projection, tmp_position[1] - tmp_vector[1] * radius_projection),
+					(tmp_position[0] + tmp_vector[0] * radius_projection, tmp_position[1] + tmp_vector[1] * radius_projection)])
+				volume_rect.draw(GREEN)
+				projection_circle = Circle(tmp_position, radius_projection)
+				result = list()
+				for obj in [projection_circle, volume_rect, poly_mouse]:			
+					col_result = collide_test(tree, allobj, obj)
+					result += col_result
+					obj.draw(GREEN if col_result else RED)
+					# print(result)
+				#----------------------------------------------
 		
   
 

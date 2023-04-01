@@ -62,51 +62,46 @@ def distance_circle_point(point, circle):
     y_proj = y2 + r * sin(angle)
     return dictance, (x_proj, y_proj)
     
+
+def intersection_libe_line(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+        return None
     
-    
-# import math
+    def onSegment(p, q, r):
+        if ((q[0] <= max(p[0], r[0])) and (q[0] >= min(p[0], r[0])) and 
+            (q[1] <= max(p[1], r[1])) and (q[1] >= min(p[1], r[1]))):
+            return True
+        return False
 
-# координаты точки
-# x1, y1 = 2, 3
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    if onSegment(line1[0],(x,y),line1[1]) and onSegment(line2[0],(x,y),line2[1]):
+        return x, y
 
-# # координаты центра окружности
-# x2, y2 = 0, 0
-
-# # радиус окружности
-# r = 5
-
-# # расстояние между центром окружности и точкой
-# d = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-
-# # угол между осью X и линией, проходящей через центр окружности и точку
-# angle = math.atan2(y1 - y2, x1 - x2)
-
-# # координаты проекции точки на окружность
-# x_proj = x2 + r * math.cos(angle)
-# y_proj = y2 + r * math.sin(angle)
-
-# print("Координаты проекции точки на окружность:", x_proj, y_proj)
- 
-
-# def distance_point_to_line(point, line):
-#     x0, y0 = point
-#     x1, y1 = line[0]
-#     x2, y2 = line[1]
-#     numerator = abs((y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1)
-#     denominator = ((y2-y1)**2 + (x2-x1)**2)**0.5
-#     distance = numerator / denominator
-#     return distance
-
-# def project_point_on_vector(point, vector): 
-#     point = np.array(point)
-#     vector = np.array(vector)
-#     return (np.dot(point, vector) / np.dot(vector, vector) * vector).tolist()
+def intersection_poly_poly(polygon1, polygon2):
+    intersections = []
+    for i in range(len(polygon1)):
+        line1 = [polygon1[i-1], polygon1[i]]
+        for j in range(len(polygon2)):
+            line2 = [polygon2[j-1], polygon2[j]]
+            point = intersection_libe_line(line1, line2)
+            if point is not None:
+                intersections.append(point)
+    return intersections
 
 
-# print(distance_point_point((100,100),(300,300)))
-# print(distance_poly_point((300, 300), ((-100,100),(100,100),(100,-100),(-100,-100))))
+polygon1 = [(0, 0), (4, 0), (4, 4), (0, 4)]
+polygon2 = [(2, 2), (6, 2), (6, 6), (2, 6)]
 
-# point = (1, 1) 
-# segment = ((0, 0), (4, 4))  
-# projected_point = project_point_to_segment(point, segment) 
-# print(projected_point) 
+# выведем список точек пересечения
+intersections = intersection_poly_poly(polygon1, polygon2)
+print("Точки пересечения: ", intersections)
+print(intersection_libe_line([(0, 0),(0, 4)], [(2, 2),(6, 2)]))
