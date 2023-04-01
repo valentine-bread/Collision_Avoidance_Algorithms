@@ -155,8 +155,8 @@ def run():
 				result += col_result
 				obj.draw(GREEN if col_result else RED)
 				print(result)
-				for r in result:
-					display.line((200 + r[1][0],150 + r[1][1]),(200,200), BLACK)
+				# for r in result:
+				# 	display.line((200 + r[1][0],150 + r[1][1]),(200,200), BLACK)
 		# ----------------------------------------------
   
 		# Алгоритм аналитический

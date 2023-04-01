@@ -182,3 +182,5 @@ def angle(v1, v2 = [(1,0),(0,0)], deg = True):
         result = np.degrees([radians.real])[0]  # переводим в градусы
  
     return result[0]
+
+
