@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, sin, cos, atan2
 import numpy as np
 
 distance_point_point = lambda point1, point2: sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
@@ -38,7 +38,8 @@ def distance_poly_point(point, poly):
         tmp_distance = distance_point_point(poly[i], point)
         if min_distance > tmp_distance:
             min_point, min_distance = i, tmp_distance
-    if check_point_in_poly(point, poly) == 1: return 0
+    if check_point_in_poly(point, poly) == 1: 
+        return 0, point
     edges = [(poly[i],poly[i+1]) for i in range(len(poly)-1)]
     edges.append((poly[0], poly[len(poly)-1])) 
     min_dist = float('inf')
@@ -49,10 +50,42 @@ def distance_poly_point(point, poly):
         if min_dist > dist:
             min_dist, min_project = dist, project
     return (min_dist, min_project)
-    
-    
-    
 
+def distance_circle_point(point, circle):
+    r = circle.radius
+    x1, y1 = point
+    x2, y2 = circle.center
+    dictance = circle.radius - distance_point_point(point, circle.center)
+    d = sqrt((x1 - x2)**2 + (y1 - y2)**2)
+    angle = atan2(y1 - y2, x1 - x2)
+    x_proj = x2 + r * cos(angle)
+    y_proj = y2 + r * sin(angle)
+    return dictance, (x_proj, y_proj)
+    
+    
+    
+# import math
+
+# координаты точки
+# x1, y1 = 2, 3
+
+# # координаты центра окружности
+# x2, y2 = 0, 0
+
+# # радиус окружности
+# r = 5
+
+# # расстояние между центром окружности и точкой
+# d = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+
+# # угол между осью X и линией, проходящей через центр окружности и точку
+# angle = math.atan2(y1 - y2, x1 - x2)
+
+# # координаты проекции точки на окружность
+# x_proj = x2 + r * math.cos(angle)
+# y_proj = y2 + r * math.sin(angle)
+
+# print("Координаты проекции точки на окружность:", x_proj, y_proj)
  
 
 # def distance_point_to_line(point, line):

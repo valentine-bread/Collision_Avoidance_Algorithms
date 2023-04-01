@@ -12,6 +12,7 @@ from pygame.locals import *
 
 from aabbtree import AABB, AABBTree
 from GJK import gjk_epa
+from distance_project import distance_poly_point, distance_circle_point
 
 
 BLACK = (  0,   0,   0)
@@ -116,6 +117,12 @@ class Poly():
 	def add(self, cx, cy):
 		self.poly = list(map(lambda x: (x[0] + cx, x[1] + cy), self.poly))
 		self.minMaxXY = self.minMax()
+  
+	def __len__(self):
+		return len(self.poly)
+
+	def dictance_to_point(self,point):
+		return distance_poly_point(point,self.poly)
 	
 class Circle():
 	center = (0,0)
@@ -150,3 +157,6 @@ class Circle():
 
 	def collidePoly(self, poly):
 		return gjk_epa.collidePolyCircle(poly, self.getCircle())
+
+	def dictance_to_point(self,point):
+		return distance_circle_point(point,self)
