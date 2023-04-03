@@ -168,22 +168,3 @@ def epa(polytope, shapeA, shapeB, f1 , f2):
 
 	return minNormal * (minDistance + 0.001)
 
-
-def dist(vector):
-	return sqrt(vector[0] ** 2 + vector[1] ** 2)
-
-# def epa_plus(polytope, shapeA, shapeB, f1 , f2):
-#     normal = epa(polytope, shapeA, shapeB, f1 , f2)
-#     shapeB = list(map(lambda x: (x[0] + normal[0], x[1] + normal[1]), shapeB))
-    
-    
-
-def angle(v1, v2 = [(1,0),(0,0)], deg = True):
-	v1_u = normalize(v1)
-	v2_u = normalize(v2)
-	radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-	result = radians
-	if deg:
-		result = np.degrees([radians.real])[0]  # переводим в градусы
- 
-	return result[0]

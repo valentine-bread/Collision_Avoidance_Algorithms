@@ -17,9 +17,6 @@ from pygame.locals import *
 from aabbtree import AABB, AABBTree
 from GJK import gjk_epa
 
-
-#sys.path.append(r"C:/Study/Мага ВКР/НИР весна 23/Test_alg/Graphic")
-
 from Graphic.graphic_gik_epa import Display, Poly, Circle, BLACK, WHITE, BLUE, GREEN, RED
 
 def normalize(vector):
@@ -43,13 +40,13 @@ def collide_test(tree, allobj, obj):
 	result = list()
 	found_points = tree.overlap_values(AABB(obj.getMinMax()))
 	collide = False
-	for f in found_points:
-		col, vector = allobj[f].collide(obj)
-		if col:
-			# result.append((f, gjk_epa.dist(vector), gjk_epa.angle(vector)))
-			result.append((f, vector))
-			collide = True
-	return result
+	# for f in found_points:
+	# 	col, vector = allobj[f].collide(obj)
+	# 	if col:
+	# 		# result.append((f, gjk_epa.dist(vector), gjk_epa.angle(vector)))
+	# 		result.append((f, vector))
+	# 		collide = True
+	return found_points
 
 def run():
 	
@@ -80,7 +77,8 @@ def run():
 	
 	allobj = list(wall)
 	allobj += furniture
-	
+
+ 
 	tree = AABBTree()
 	for i in range(len(allobj)):
 		aabb = AABB(allobj[i].getMinMax())
@@ -153,16 +151,16 @@ def run():
 					volume_rect.draw(GREEN)
 					projection_circle = Circle(tmp_position, 20)
 					result = list()
-					# for obj in [projection_circle, volume_rect, poly_mouse]:	
-					for obj in [volume_rect]:			
+					for obj in [projection_circle, volume_rect, poly_mouse]:	
+					# for obj in [volume_rect]:			
 						col_result = collide_test(tree, allobj, obj)
 						result += col_result
 						obj.draw(GREEN if col_result else RED)
 						if col_result:
 							# print(result)
-							for f,_ in col_result:
+							for f in col_result:
 								print(f)
-								points = allobj[f].intersection_poly(obj)
+								points = allobj[f].intersection(obj)
 								print(points)
 								for point in points:
 									display.line(poly_mouse.center, point, BLACK) 

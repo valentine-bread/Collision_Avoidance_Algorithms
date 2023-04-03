@@ -11,7 +11,7 @@ import pygame
 from pygame.locals import *
 
 from aabbtree import AABB, AABBTree
-from GJK import gjk_epa
+from SAT import sat
 from distance_project import distance_poly_point, distance_circle_point, intersection_poly_poly, intersection_poly_circle, intersection_circle_circle
 
 
@@ -31,6 +31,7 @@ class Display:
  
 	def __init__(self):
 		pygame.init()
+		pass
 	
 	@staticmethod
 	def circles(cs, color=BLACK, camera=(0, 0)):
@@ -103,10 +104,10 @@ class Poly():
 		return obj.collidePoly(self.poly)
 
 	def collideCircle(self, circle):
-		return gjk_epa.collidePolyCircle(self.poly, circle)
+		return sat.separating_axis_theorem(self.poly, circle)
 
 	def collidePoly(self, poly):
-		return gjk_epa.collidePolyPoly(self.poly, poly)
+		return sat.separating_axis_theorem(self.poly, poly)
 
 	def draw(self, color):
 		Display.polygon(self.poly, color)
@@ -163,10 +164,10 @@ class Circle():
 		return obj.collideCircle(self.getCircle())
 
 	def collideCircle(self, circle):
-		return gjk_epa.collideCircleCircle(self.getCircle(), circle)
+		return sat.separating_axis_theorem(self.getCircle(), circle)
 
 	def collidePoly(self, poly):
-		return gjk_epa.collidePolyCircle(poly, self.getCircle())
+		return sat.separating_axis_theorem(poly, self.getCircle())
 
 	def dictance_to_point(self,point):
 		return distance_circle_point(point,self)

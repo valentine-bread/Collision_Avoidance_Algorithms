@@ -1,8 +1,30 @@
 from math import sqrt, sin, cos, atan2
 import numpy as np
+from shapely.geometry import Polygon, Point
 
 distance_point_point = lambda point1, point2: sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
 
+
+def distance(vector):
+	return sqrt(vector[0] ** 2 + vector[1] ** 2)
+
+# def epa_plus(polytope, shapeA, shapeB, f1 , f2):
+#     normal = epa(polytope, shapeA, shapeB, f1 , f2)
+#     shapeB = list(map(lambda x: (x[0] + normal[0], x[1] + normal[1]), shapeB))
+    
+    
+def normalize(vector):
+	return vector / np.linalg.norm(vector) 
+
+def angle(v1, v2 = [(1,0),(0,0)], deg = True):
+	v1_u = normalize(v1)
+	v2_u = normalize(v2)
+	radians = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+	result = radians
+	if deg:
+		result = np.degrees([radians.real])[0]  # переводим в градусы
+ 
+	return result[0]
 
 def project_point_to_segment(point, segment):     
     """     
@@ -55,7 +77,7 @@ def distance_circle_point(point, circle):
     r = circle.radius
     x1, y1 = point
     x2, y2 = circle.center
-    dictance = circle.radius - distance_point_point(point, circle.center)
+    dictance = distance_point_point(point, circle.center) - circle.radius 
     d = sqrt((x1 - x2)**2 + (y1 - y2)**2)
     angle = atan2(y1 - y2, x1 - x2)
     x_proj = x2 + r * cos(angle)
@@ -98,10 +120,60 @@ def intersection_poly_poly(polygon1, polygon2):
     return intersections
 
 
-polygon1 = [(0, 0), (4, 0), (4, 4), (0, 4)]
-polygon2 = [(2, 2), (6, 2), (6, 6), (2, 6)]
+def intersection_poly_circle(poly, circle):
+    poly = Polygon(poly)
+    circle = Point(circle.center).buffer(circle.radius)
 
-# выведем список точек пересечения
-intersections = intersection_poly_poly(polygon1, polygon2)
-print("Точки пересечения: ", intersections)
-print(intersection_libe_line([(0, 0),(0, 4)], [(2, 2),(6, 2)]))
+    intersections = poly.exterior.intersection(circle)
+    if intersections.is_empty:
+        return ()
+    elif intersections.geom_type.startswith('Multi') or intersections.geom_type == 'GeometryCollection':
+        intersections.explode() 
+        for f in intersections:
+            return f.coords
+    else:
+        return intersections.coords.xy
+
+    
+    
+def intersection_circle_circle(circle1, circle2):
+    (x0, y0), r0 = circle1.center, circle1.radius 
+    (x1, y1), r1 = circle2.center, circle2.radius 
+
+    d=sqrt((x1-x0)**2 + (y1-y0)**2)
+    if d > r0 + r1 :
+        return []
+    if d < abs(r0-r1):
+        return []
+    if d == 0 and r0 == r1:
+        return []
+    else:
+        a=(r0**2-r1**2+d**2)/(2*d)
+        h=sqrt(r0**2-a**2)
+        x2=x0+a*(x1-x0)/d   
+        y2=y0+a*(y1-y0)/d   
+        x3=x2+h*(y1-y0)/d     
+        y3=y2-h*(x1-x0)/d 
+
+        x4=x2-h*(y1-y0)/d
+        y4=y2+h*(x1-x0)/d   
+        return [(x3, y3), (x4, y4)]
+    
+    
+    
+# from shapely.geometry import Polygon, Point, LinearRing  
+# # задаем координаты вершин полигона 
+# polygon_coords = [(0, 0), (0, 5), (5, 5), (5, 0)]  
+# # создаем объект полигона 
+# polygon = Polygon(polygon_coords)  # задаем центр окружности и ее радиус 
+# circle_center = Point(2.5, 2.5) 
+# circle_radius = 10  
+# # находим точки пересечения полигона и окружности 
+# circle = Point(0.5, 0.5).buffer(0.5)
+# intersection = polygon.intersection(circle)
+# # выводим координаты точек пересечения 
+# pts = list(intersection.exterior.coords)
+# print(pts)
+# xx, yy = intersection_points.exterior.coords.xy
+# # print(xx.tolist(), yy.tolist()) 
+# print(list(zip(xx.tolist(), yy.tolist())))
