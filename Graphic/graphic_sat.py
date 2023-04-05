@@ -40,7 +40,7 @@ class Display:
 
 	@staticmethod
 	def circle(c, color=BLACK, camera=(0, 0)):
-		pygame.draw.circle(Display.SCREEN, color, Display.add(c[0], camera), c[1])
+		pygame.draw.circle(Display.SCREEN, color, Display.add(c[0], camera), c[1], 1)
 	
 	@staticmethod
 	def pairs(points):

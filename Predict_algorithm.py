@@ -1,4 +1,4 @@
-frequency = 20
+frequency = 15
 norm_noise = 20
 time_predict = 3
 # alg = 'multi_detect'
