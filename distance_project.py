@@ -78,7 +78,8 @@ def distance_circle_point(point, circle):
     x1, y1 = point
     x2, y2 = circle.center
     dictance = distance_point_point(point, circle.center) - circle.radius 
-    d = sqrt((x1 - x2)**2 + (y1 - y2)**2)
+    if dictance <= circle.radius: distance = 0
+    # d = sqrt((x1 - x2)**2 + (y1 - y2)**2)
     angle = atan2(y1 - y2, x1 - x2)
     x_proj = x2 + r * cos(angle)
     y_proj = y2 + r * sin(angle)

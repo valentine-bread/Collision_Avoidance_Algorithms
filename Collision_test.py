@@ -2,7 +2,7 @@ frequency = 10
 norm_noise = 20
 time_predict = 2
 dist_pred = 100
-alg = 3
+alg = 1
 
 from math import sqrt, radians, sin, cos
 import sys
@@ -136,10 +136,10 @@ def run(quantity):
 							if  f not in circle_result.keys() or (f in circle_result.keys() and circle_result[f][0] > dist):
 								circle_result[f] = (dist, ang, project)
 							collision.add(f)
-					tmp_circle.draw(BLACK)
+					tmp_circle.draw(BLUE)
 					tmp_result = tmp_result | circle_result
-				for point in circle_result.values():
-					display.line(position, point[2])
+					for point in circle_result.values():
+						display.line(position, point[2], RED)
 				
 			case 4:
 				tmp_position = position_list.get()
@@ -153,11 +153,11 @@ def run(quantity):
 						(position[0] - tmp_vector[0] * norm_noise, position[1] - tmp_vector[1] * norm_noise),
 						(tmp_position[0] - tmp_vector[0] * norm_noise, tmp_position[1] - tmp_vector[1] * norm_noise),
 						(tmp_position[0] + tmp_vector[0] * norm_noise, tmp_position[1] + tmp_vector[1] * norm_noise)])
-					volume_rect.draw(GREEN)
+					# volume_rect.draw(BLACK)
 					projection_circle = Circle(tmp_position, 20)
 					for obj in [volume_rect]:		
 						col_result = tree.overlap_values(AABB(obj.getMinMax())) 
-						obj.draw(GREEN if col_result else RED)
+						obj.draw(BLUE)
 						for f in col_result:
 							points = allobj[f].intersection(obj)	
 							min_dist = float('inf')
@@ -168,7 +168,7 @@ def run(quantity):
 									point = p
 							if points :
 								# point = (np.mean([p[0] for p in points]), np.mean([p[1] for p in points]))
-								display.line(position, point, BLACK) 
+								display.line(position, point, RED) 
 								# result.append((f, min_dist, angle([position, point])))
 								# tmp_result.append((obj, distance(vector), angle(vector)))
 								tmp_result[f] = (min_dist, angle(point, position)) 
@@ -195,7 +195,7 @@ def run(quantity):
 		result.append(dict_result)
 		previousPosition = position
 		pygame.display.flip()
-		display.CLOCK.tick(10) 
+		display.CLOCK.tick(0) 
 	return result
 		
 if __name__ == '__main__':
