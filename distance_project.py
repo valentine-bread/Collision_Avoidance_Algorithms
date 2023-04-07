@@ -24,7 +24,7 @@ def angle(v1, v2 = [(1,0),(0,0)], deg = True):
 	if deg:
 		result = np.degrees([radians.real])[0]  # переводим в градусы
  
-	return result[0]
+	return result
 
 def project_point_to_segment(point, segment):     
     """     

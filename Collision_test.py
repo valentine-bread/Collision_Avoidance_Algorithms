@@ -1,8 +1,8 @@
-frequency = 0
+frequency = 10
 norm_noise = 20
-time_predict = 1
+time_predict = 2
 dist_pred = 100
-alg = 2
+alg = 3
 
 from math import sqrt, radians, sin, cos
 import sys
@@ -88,14 +88,14 @@ def run(quantity):
 			allobj[i].draw(BLACK)
 		poly_mouse.draw(BLUE)
 		collision = set()
-		tmp_result = list()
+		tmp_result = dict()
 	
 		match alg:
 			case 1:		
 				for obj in range(len(allobj)):
 					dis, vector = allobj[obj].dictance_to_point(position)
 					if dis < norm_noise + dist_pred:
-						tmp_result.append((obj, distance(vector), angle(vector)))
+						tmp_result[obj] = (dis, angle(vector, position))
 						collision.add(obj)
 						display.line(position, vector, RED)
 					else:
@@ -108,7 +108,7 @@ def run(quantity):
 					dis, vector = allobj[obj].dictance_to_point(position)
 					if dis < norm_noise + dist_pred:
 						# result.append((obj, distance(vector), angle(vector)))
-						tmp_result.append((obj, distance(vector), angle(vector)))
+						tmp_result[obj] = (dis, angle(vector, position))
 						collision.add(obj)
 						display.line(position, vector, RED)
 					else:
@@ -118,31 +118,34 @@ def run(quantity):
 			case 3:
 				tmp_position = position_list.get()
 				position_list.put(position)
-				# move = ((position[0] - tmp_position[0]), (position[1] - tmp_position[1])) 
-				move = ((position[0] - previousPosition[0]) / (1/frequency), (position[1] - previousPosition[1]) / (1/frequency)) 
+				move = ((position[0] - tmp_position[0]), (position[1] - tmp_position[1])) 
+				# move = ((position[0] - previousPosition[0]) / (1/frequency), (position[1] - previousPosition[1]) / (1/frequency)) 
 				for i in range(1,time_predict  * frequency, 2):
+					circle_result = dict()
 					tmp_position = (position[0] + (move[0] / frequency) * i, position[1] + (move[1] / frequency)*i)
 					tmp_circle = Circle(tmp_position,norm_noise)
 					found_points = tree.overlap_values(AABB(tmp_circle.getMinMax()))
-					result = list()
-					collide = False	
+					# collide = False	
 					for f in found_points:
 						col = allobj[f].collide(tmp_circle)
 						if col:
-							dist, vector = allobj[f].dictance_to_point(tmp_circle.center)
-							display.line(position, vector, GREEN)
-							collide = True
-							# result.append((f, dist, angle([position, vector])))
-							tmp_result.append((obj, distance(vector), angle(vector)))
+							_, project = allobj[f].dictance_to_point(tmp_circle.center)
+							# collide = True
+							dist = distance_point_point(position, project)
+							ang = angle(position, project)
+							if  f not in circle_result.keys() or (f in circle_result.keys() and circle_result[f][0] > dist):
+								circle_result[f] = (dist, ang, project)
 							collision.add(f)
-							print((f, dist, angle([position, vector])))
-					tmp_circle.draw(BLACK)			
-
+					tmp_circle.draw(BLACK)
+					tmp_result = tmp_result | circle_result
+				for point in circle_result.values():
+					display.line(position, point[2])
+				
 			case 4:
 				tmp_position = position_list.get()
 				position_list.put(position)
-				# move = ((position[0] - tmp_position[0]), (position[1] - tmp_position[1])) 
-				move = ((position[0] - previousPosition[0]) / (1/frequency), (position[1] - previousPosition[1]) / (1/frequency)) 
+				move = ((position[0] - tmp_position[0]), (position[1] - tmp_position[1]))
+				# move = ((position[0] - previousPosition[0]) / (1/frequency), (position[1] - previousPosition[1]) / (1/frequency)) 
 				if move != (0,0):
 					tmp_position = (position[0] + (move[0] * time_predict* frequency  * (1/frequency)), position[1] + (move[1] * time_predict* frequency  * (1/frequency)))		
 					tmp_vector = normalize(orthogonal(edge_direction(poly_mouse.center, tmp_position)))
@@ -167,7 +170,8 @@ def run(quantity):
 								# point = (np.mean([p[0] for p in points]), np.mean([p[1] for p in points]))
 								display.line(position, point, BLACK) 
 								# result.append((f, min_dist, angle([position, point])))
-								tmp_result.append((obj, distance(vector), angle(vector)))
+								# tmp_result.append((obj, distance(vector), angle(vector)))
+								tmp_result[f] = (min_dist, angle(point, position)) 
 								collision.add(f)
 								# for point in points:
 								# 	display.line(poly_mouse.center, point, BLACK) 			
@@ -183,14 +187,15 @@ def run(quantity):
 		if new_collision:
 			print(*new_collision)
 			collision_list = collision
-		dict_result = {r[0] : (r[1], r[2]) for r in tmp_result}
-		tmp_result = list()
+		# dict_result = {r[0] : (r[1], r[2]) for r in tmp_result}
+		dict_result = list()
 		for c in new_collision:
-			tmp_result.append((c, *dict_result[c]))
-		result.append(tmp_result)
+			dict_result.append((c, tmp_result[c][0], tmp_result[c][1]))
+		print(dict_result)
+		result.append(dict_result)
 		previousPosition = position
 		pygame.display.flip()
-		display.CLOCK.tick(frequency) 
+		display.CLOCK.tick(10) 
 	return result
 		
 if __name__ == '__main__':
