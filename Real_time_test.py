@@ -1,7 +1,7 @@
 frequency = 15
 norm_noise = 20
 time_predict = 3
-alg = 3
+alg = 4
 
 from math import sqrt, radians, sin, cos
 import sys
@@ -162,14 +162,16 @@ def run(quantity):
 						obj.draw(GREEN if col_result else RED)
 						for f in col_result:
 							points = allobj[f].intersection(obj)		
-							min_dist = float('inf')
-							for p in points:
-								dist = distance_point_point(p, position)
-								if dist < min_dist:
-									min_dist = dist 
-									point = p
+							# min_dist = float('inf')							
+							# for p in points:
+							# 	dist = distance_point_point(p, position)
+							# 	if dist < min_dist:
+							# 		min_dist = dist 
+							# 		point = p
 							# point = (np.mean([p[0] for p in points]), np.mean([p[1] for p in points]))
-							display.line(poly_mouse.center, point, BLACK) 
+							if points:
+								point = sorted(points, key=lambda p: distance_point_point(p, position))[0]
+								display.line(poly_mouse.center, point, BLACK) 
 							# for point in points:
 							# 	display.line(poly_mouse.center, point, BLACK) 			
 

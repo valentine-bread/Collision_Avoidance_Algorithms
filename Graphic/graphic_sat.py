@@ -131,9 +131,9 @@ class Poly():
 	def intersection_poly(self,poly1):
 		return intersection_poly_poly(self.poly, poly1.poly)
 
-	def intersection_circle(self,poly1):
-		# return intersection_poly_circle(poly1.poly, self)
-		return []
+	def intersection_circle(self,circle):
+		return intersection_poly_circle(self.poly, circle)
+		# return []
 	
 class Circle():
 	center = (0,0)
@@ -176,8 +176,8 @@ class Circle():
 		return obj.intersection_circle(self)
 
 	def intersection_poly(self,poly1):
-		# return intersection_poly_circle(poly1.poly, self)
-		return []
+		return intersection_poly_circle(poly1.poly, self)
+		# return []
 
 	def intersection_circle(self,circle1):
 		return intersection_circle_circle(self, circle1)

@@ -121,20 +121,43 @@ def intersection_poly_poly(polygon1, polygon2):
     return intersections
 
 
-def intersection_poly_circle(poly, circle):
-    poly = Polygon(poly)
-    circle = Point(circle.center).buffer(circle.radius)
+def is_circle_inside_polygon(polygon, center, radius):
+    for point in polygon:
+        if distance_point_point(center, point) > radius:
+            return False
+    return True
 
-    intersections = poly.exterior.intersection(circle)
-    if intersections.is_empty:
-        return ()
-    elif intersections.geom_type.startswith('Multi') or intersections.geom_type == 'GeometryCollection':
-        intersections.explode() 
-        for f in intersections:
-            return f.coords
-    else:
-        return intersections.coords.xy
 
+def intersection_poly_circle(polygon, circle):
+    center, radius = circle.center, circle.radius
+    intersection_points = []
+    polygon_length = len(polygon)
+
+    for i in range(polygon_length):
+        p1 = polygon[i]
+        p2 = polygon[(i + 1) % polygon_length]  
+
+        x1, y1 = p1
+        x2, y2 = p2
+        dx = x2 - x1
+        dy = y2 - y1
+        A = dx ** 2 + dy ** 2
+        B = 2 * (dx * (x1 - center[0]) + dy * (y1 - center[1]))
+        C = (x1 - center[0]) ** 2 + (y1 - center[1]) ** 2 - radius ** 2
+        discriminant = B ** 2 - 4 * A * C
+        if discriminant < 0:
+            continue
+        t1 = (-B + sqrt(discriminant)) / (2 * A)
+        t2 = (-B - sqrt(discriminant)) / (2 * A)
+        if 0 <= t1 <= 1:
+            intersection_points.append((x1 + t1 * dx, y1 + t1 * dy))
+        
+        if 0 <= t2 <= 1:
+            intersection_points.append((x1 + t2 * dx, y1 + t2 * dy))
+    
+    return intersection_points
+    
+    
     
     
 def intersection_circle_circle(circle1, circle2):
@@ -161,20 +184,3 @@ def intersection_circle_circle(circle1, circle2):
         return [(x3, y3), (x4, y4)]
     
     
-    
-# from shapely.geometry import Polygon, Point, LinearRing  
-# # задаем координаты вершин полигона 
-# polygon_coords = [(0, 0), (0, 5), (5, 5), (5, 0)]  
-# # создаем объект полигона 
-# polygon = Polygon(polygon_coords)  # задаем центр окружности и ее радиус 
-# circle_center = Point(2.5, 2.5) 
-# circle_radius = 10  
-# # находим точки пересечения полигона и окружности 
-# circle = Point(0.5, 0.5).buffer(0.5)
-# intersection = polygon.intersection(circle)
-# # выводим координаты точек пересечения 
-# pts = list(intersection.exterior.coords)
-# print(pts)
-# xx, yy = intersection_points.exterior.coords.xy
-# # print(xx.tolist(), yy.tolist()) 
-# print(list(zip(xx.tolist(), yy.tolist())))
